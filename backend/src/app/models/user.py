@@ -3,6 +3,10 @@ from sqlalchemy import String, Boolean, Enum as SAEnum, ForeignKey, DateTime, fu
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 from app.models.enums import UserRole
+from backend.src.app.models.approval_history import ApprovalHistory
+from backend.src.app.models.booking import RoomBooking
+from backend.src.app.models.department import Department
+from backend.src.app.models.notification import Notification
 
 class User(Base):
     __tablename__ = "users"

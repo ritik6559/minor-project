@@ -3,6 +3,12 @@ from sqlalchemy import String, Text, Integer, DateTime, ForeignKey, Enum as SAEn
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 from app.models.enums import BookingStatus
+from backend.src.app.models.approval_history import ApprovalHistory
+from backend.src.app.models.availability_block import RoomAvailabilityBlock
+from backend.src.app.models.department import Department
+from backend.src.app.models.notification import Notification
+from backend.src.app.models.room import Room
+from backend.src.app.models.user import User
 
 class RoomBooking(Base):
     __tablename__ = "room_bookings"
