@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/static-components */
 import { BookingRequest, Role, Comment } from "@/types/booking";
 import { fmtDate } from "@/lib/booking-utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

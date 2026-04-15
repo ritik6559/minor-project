@@ -11,38 +11,28 @@ const Footer = () => {
               <div className="hero-gradient rounded-lg p-1.5">
                 <GraduationCap className="h-5 w-5 text-primary-foreground" />
               </div>
-              <span className="text-lg font-bold">CampusHub</span>
+              <span className="text-lg font-bold">JUIT RoomBook</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Smart room booking and AI-powered college assistant for modern
-              campuses.
+              Streamlined room booking with multi-level digital approval workflow for JUIT campus.
             </p>
           </div>
           <div>
             <h4 className="font-semibold mb-3 text-sm">Platform</h4>
             <div className="flex flex-col gap-2">
-              <Link
-                to="/dashboard"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <Link to="/login" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                 Room Booking
               </Link>
-              <Link
-                to="/chatbot"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                AI Chatbot
-              </Link>
-              <Link
-                to="/admin"
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Admin Panel
-              </Link>
+              <a href="/#features" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                Features
+              </a>
+              <a href="/#how-it-works" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                How It Works
+              </a>
             </div>
           </div>
           <div>
-            <h4 className="font-semibold mb-3 text-sm">College</h4>
+            <h4 className="font-semibold mb-3 text-sm">University</h4>
             <div className="flex flex-col gap-2">
               <span className="text-sm text-muted-foreground">Admissions</span>
               <span className="text-sm text-muted-foreground">Departments</span>
@@ -54,14 +44,12 @@ const Footer = () => {
             <div className="flex flex-col gap-2">
               <span className="text-sm text-muted-foreground">Help Center</span>
               <span className="text-sm text-muted-foreground">Contact Us</span>
-              <span className="text-sm text-muted-foreground">
-                Privacy Policy
-              </span>
+              <span className="text-sm text-muted-foreground">Privacy Policy</span>
             </div>
           </div>
         </div>
         <div className="mt-8 pt-8 border-t text-center text-sm text-muted-foreground">
-          © 2026 CampusHub. All rights reserved.
+          © {new Date().getFullYear()} Jaypee University of Information Technology, Waknaghat. All rights reserved.
         </div>
       </div>
     </footer>

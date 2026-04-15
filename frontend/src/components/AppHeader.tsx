@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { GraduationCap, LogOut, User } from "lucide-react";
 
@@ -13,42 +13,38 @@ export function AppHeader() {
   };
 
   return (
-    <header className="bg-primary text-primary-foreground">
-      <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <div className="bg-accent text-accent-foreground p-2.5 rounded-lg">
-            <GraduationCap className="w-6 h-6" />
+    <header className="border-b bg-card px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+          <div className="hero-gradient rounded-lg p-1.5">
+            <GraduationCap className="w-5 h-5 text-primary-foreground" />
           </div>
-          <div>
-            <h1 className="text-lg font-bold font-sans tracking-tight">Room Booking System</h1>
-            <p className="text-xs text-primary-foreground/70">
-              Jaypee University of Information Technology, Waknaghat
-            </p>
-          </div>
-        </div>
-
+          <span className="text-lg font-bold hidden sm:inline">JUIT RoomBook</span>
+        </Link>
         {user && (
-          <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-semibold">{user.name}</p>
-              <p className="text-xs text-primary-foreground/70">{user.role}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="bg-primary-foreground/10 p-2 rounded-lg sm:hidden">
-                <User className="w-4 h-4" />
-              </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleLogout}
-                className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              >
-                <LogOut className="w-4 h-4 mr-1" /> Logout
-              </Button>
-            </div>
-          </div>
+          <span className="text-sm text-muted-foreground ml-2 hidden sm:inline">
+            / {user.role} Dashboard
+          </span>
         )}
       </div>
+
+      {user && (
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-muted rounded-lg px-3 py-1.5">
+            <User className="w-3.5 h-3.5 text-muted-foreground" />
+            <span className="text-xs font-medium hidden sm:inline">{user.name}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleLogout}
+            className="text-muted-foreground hover:text-foreground h-8 px-2.5"
+          >
+            <LogOut className="w-3.5 h-3.5" />
+            <span className="ml-1.5 hidden sm:inline text-xs">Logout</span>
+          </Button>
+        </div>
+      )}
     </header>
   );
 }

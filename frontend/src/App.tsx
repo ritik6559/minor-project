@@ -7,6 +7,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Login from "./pages/Login";
 import RoleDashboard from "./pages/RoleDashboard";
 import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
 
 const queryClient = new QueryClient();
 
@@ -17,6 +18,7 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/faculty" element={<ProtectedRoute allowedRole="Faculty (Requester)"><RoleDashboard role="Faculty (Requester)" /></ProtectedRoute>} />
             <Route path="/approver" element={<ProtectedRoute allowedRole="Faculty (Approver)"><RoleDashboard role="Faculty (Approver)" /></ProtectedRoute>} />
