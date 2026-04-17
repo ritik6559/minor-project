@@ -20,5 +20,5 @@ class BaseRepository(Generic[ModelT]):
         await self.db.refresh(obj)
         return obj
 
-    async def delete(self, id: str) -> None:
+    async def delete_by_id(self, id: str) -> None:
         await self.db.execute(delete(self.model).where(self.model.id == id))
