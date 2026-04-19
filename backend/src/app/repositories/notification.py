@@ -30,7 +30,7 @@ class NotificationRepository(BaseRepository[Notification]):
     async def mark_all_read(self, user_id: str) -> None:
         await self.db.execute(
             update(Notification)
-            .where(Notification.user_id == user_id, Notification.is_read == False)  # noqa: E712
+            .where(Notification.user_id == user_id, Notification.is_read == False) 
             .values(is_read=True)
         )
 
@@ -38,7 +38,7 @@ class NotificationRepository(BaseRepository[Notification]):
         result = await self.db.execute(
             select(Notification).where(
                 Notification.user_id == user_id,
-                Notification.is_read == False,  # noqa: E712
+                Notification.is_read == False, 
             )
         )
         return len(result.scalars().all())

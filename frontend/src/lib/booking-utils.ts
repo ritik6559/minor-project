@@ -1,40 +1,22 @@
-import { BookingRequest, Role, Status, STEP_KEYS } from "@/types/booking";
+import type { BookingStatus } from "@/types/booking";
 
-export function newForm(): BookingRequest {
-  return {
-    id: "", room: "LT1", facultyName: "", designation: "", phone: "", department: "",
-    dates: [{ date: "", from: "", to: "" }],
-    refreshment: false, refreshDetails: "", paSystem: false, strength: "", purpose: "",
-    status: "draft", createdAt: 0, updatedAt: 0,
-    facultySignature: "", hodSignature: "", hodApproved: null,
-    adminRemarks: "", adminAvailability: "Available", adminSignature: "",
-    registrarApproved: null, registrarSignature: "",
-    comments: [],
-  };
-}
+export const statusMeta: Record<BookingStatus, { label: string; className: string }> = {
+  PENDING_HOD:    { label: "Pending HOD",    className: "bg-warning/15 text-warning border-warning/30" },
+  PENDING_ADMIN:  { label: "Pending Admin",  className: "bg-info/15 text-info border-info/30" },
+  PENDING_DEAN:   { label: "Pending Dean",   className: "bg-purple/15 text-purple border-purple/30" },
+  DEAN_APPROVED:  { label: "Approved",       className: "bg-success/15 text-success border-success/30" },
+  HOD_REJECTED:   { label: "Rejected by HOD",   className: "bg-destructive/15 text-destructive border-destructive/30" },
+  ADMIN_REJECTED: { label: "Rejected by Admin", className: "bg-destructive/15 text-destructive border-destructive/30" },
+  DEAN_REJECTED:  { label: "Rejected by Dean",  className: "bg-destructive/15 text-destructive border-destructive/30" },
+  CANCELLED:      { label: "Cancelled",      className: "bg-muted text-muted-foreground border-border" },
+};
 
-export function getStepIndex(status: Status): number {
-  const idx = STEP_KEYS.indexOf(status);
-  return idx === -1 ? 0 : idx;
-}
-
-export function canActOn(req: BookingRequest, role: Role): boolean {
-  if (role === "Faculty (Requester)") return req.status === "draft" || req.status === "pending_sign";
-  if (role === "HOD") return req.status === "pending_hod";
-  if (role === "Admin Officer") return req.status === "pending_admin";
-  if (role === "Registrar") return req.status === "pending_registrar";
-  return false;
-}
-
-export function visibleRequests(reqs: BookingRequest[], role: Role): BookingRequest[] {
-  if (role === "Faculty (Requester)") return reqs.filter(r => r.status === "draft" || r.status === "pending_sign");
-  if (role === "Faculty (Approver)") return reqs.filter(r => r.status !== "draft");
-  if (role === "HOD") return reqs.filter(r => ["pending_hod", "approved", "rejected"].includes(r.status));
-  if (role === "Admin Officer") return reqs.filter(r => ["pending_admin", "approved", "rejected"].includes(r.status));
-  if (role === "Registrar") return reqs.filter(r => ["pending_registrar", "approved", "rejected"].includes(r.status));
-  return reqs;
-}
-
-export function fmtDate(ts: number): string {
-  return new Date(ts).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+export function formatDateRange(date: string, start: string, end: string): string {
+  try {
+    const d = new Date(`${date}T${start}`);
+    const dStr = d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    return `${dStr} · ${start.slice(0,5)} – ${end.slice(0,5)}`;
+  } catch {
+    return `${date} · ${start} – ${end}`;
+  }
 }

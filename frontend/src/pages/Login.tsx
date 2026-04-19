@@ -1,158 +1,109 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useAuth } from "@/contexts/AuthContext";
-import { Role, ROLES, ROLE_ROUTES } from "@/types/booking";
+import { Loader2, LogIn, Mail, Lock, Building2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  GraduationCap,
-  LogIn,
-  UserCircle,
-  Shield,
-  ClipboardCheck,
-  Settings,
-  Stamp,
-  CheckCircle2,
-} from "lucide-react";
+import { api, extractApiError } from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { decodeJwt, dashboardPathForRole } from "@/lib/jwt";
 
-const ROLE_META: Record<Role, { icon: typeof UserCircle; description: string }> = {
-  "Faculty (Requester)": {
-    icon: UserCircle,
-    description: "Create and submit room booking requests",
-  },
-  "Faculty (Approver)": {
-    icon: ClipboardCheck,
-    description: "View and track all submitted requests",
-  },
-  HOD: {
-    icon: Shield,
-    description: "Approve or reject department requests",
-  },
-  "Admin Officer": {
-    icon: Settings,
-    description: "Verify availability and process bookings",
-  },
-  Registrar: {
-    icon: Stamp,
-    description: "Final approval authority with comments",
-  },
-};
+const schema = z.object({
+  email: z.string().trim().email("Enter a valid email").max(255),
+  password: z.string().min(1, "Password is required").max(200),
+});
+type FormValues = z.infer<typeof schema>;
 
-export default function Login() {
-  const [name, setName] = useState("");
-  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
-  const [error, setError] = useState("");
-  const { login } = useAuth();
+export default function LoginPage() {
+  // const { login } = useAuth();
   const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleLogin = () => {
-    if (!name.trim()) {
-      setError("Please enter your name.");
-      return;
+  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: "", password: "" },
+  });
+
+  const onSubmit = async (values: FormValues) => {
+    setSubmitting(true);
+    try {
+      // const res = await api.post("/auth/login", values);
+      // const token: string | undefined =
+      //   res.data?.access_token || res.data?.token || res.data?.data?.access_token;
+      // if (!token) throw new Error("No token returned from server");
+      // login(token);
+      // const decoded = decodeJwt(token);
+      // toast.success("Welcome back");
+      console.log("Hello");
+      navigate(dashboardPathForRole("faculty"), { replace: true });
+    } catch (err) {
+      toast.error(extractApiError(err, "Login failed"));
+    } finally {
+      setSubmitting(false);
     }
-    if (!selectedRole) {
-      setError("Please select your role.");
-      return;
-    }
-    login(name.trim(), selectedRole);
-    navigate(ROLE_ROUTES[selectedRole]);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
+    <div className="relative min-h-screen w-full overflow-hidden bg-app-gradient flex items-center justify-center px-4">
+      {/* animated background blobs */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-32 -left-24 h-112 w-md rounded-full bg-accent/30 blur-3xl animate-blob" />
+        <div className="absolute top-1/3 -right-24 h-96 w-[24rem] rounded-full bg-purple/30 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
+        <div className="absolute -bottom-24 left-1/3 h-88 w-88 rounded-full bg-info/25 blur-3xl animate-blob" style={{ animationDelay: "8s" }} />
+      </div>
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
+        className="relative w-full max-w-md"
       >
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="hero-gradient rounded-lg p-2">
-              <GraduationCap className="h-6 w-6 text-primary-foreground" />
+        <div className="glass-strong rounded-2xl p-8 shadow-elegant">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent-gradient text-accent-foreground shadow-elegant">
+              <Building2 className="h-5 w-5" />
             </div>
-            <span className="text-xl font-bold">JUIT RoomBook</span>
-          </Link>
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-muted-foreground text-sm mt-1">
-            Sign in to access your personalized dashboard
-          </p>
-        </div>
-
-        <div className="glass-card rounded-xl p-6">
-          <div className="space-y-5">
-            {error && (
-              <div className="bg-destructive/10 border border-destructive/30 text-destructive rounded-lg p-3 text-sm font-medium">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Full Name
-              </Label>
-              <Input
-                id="name"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => { setName(e.target.value); setError(""); }}
-                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                className="h-11"
-              />
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">College Room Booking</h1>
+              <p className="text-sm text-muted-foreground">Sign in to manage your bookings</p>
             </div>
-
-            <div className="space-y-2.5">
-              <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Select Your Role
-              </Label>
-              <div className="grid gap-2">
-                {ROLES.map((role) => {
-                  const meta = ROLE_META[role];
-                  const Icon = meta.icon;
-                  const isSelected = selectedRole === role;
-                  return (
-                    <button
-                      key={role}
-                      onClick={() => { setSelectedRole(role); setError(""); }}
-                      className={`flex items-center gap-3 p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                        isSelected
-                          ? "border-primary bg-primary/5 shadow-sm"
-                          : "border-border hover:border-primary/30 hover:bg-muted/30"
-                      }`}
-                    >
-                      <div className={`p-2 rounded-lg transition-colors ${
-                        isSelected ? "hero-gradient text-primary-foreground" : "bg-primary/10 text-primary"
-                      }`}>
-                        <Icon className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-semibold transition-colors ${
-                          isSelected ? "text-primary" : "text-foreground"
-                        }`}>
-                          {role}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground leading-tight">{meta.description}</p>
-                      </div>
-                      {isSelected && <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            <Button
-              onClick={handleLogin}
-              className="w-full h-11 text-sm font-semibold hero-gradient text-primary-foreground hover:opacity-90"
-              size="lg"
-            >
-              <LogIn className="w-4 h-4 mr-2" /> Sign In
-            </Button>
-
-            <p className="text-center text-[11px] text-muted-foreground">
-              This is a demo — no password required
-            </p>
           </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+            <div className="space-y-1.5">
+              <Label htmlFor="email">Email</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input id="email" type="email" autoComplete="email" placeholder="you@college.edu"
+                  className="pl-9" {...register("email")} />
+              </div>
+              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••"
+                  className="pl-9" {...register("password")} />
+              </div>
+              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+            </div>
+
+            <Button type="submit" disabled={submitting} className="mt-2 h-11 w-full bg-accent-gradient text-accent-foreground shadow-elegant hover:opacity-95">
+              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+              {submitting ? "Signing in…" : "Sign In"}
+            </Button>
+          </form>
+
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            New users are added by an administrator.
+          </p>
         </div>
       </motion.div>
     </div>
