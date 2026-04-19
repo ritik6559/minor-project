@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import String, ForeignKey, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
-from backend.src.app.models.booking import RoomBooking
-from backend.src.app.models.user import User
+
+if TYPE_CHECKING:
+    from app.models.user import User
+    from app.models.booking import RoomBooking
+
 
 class Department(Base):
     __tablename__ = "departments"
@@ -15,7 +21,6 @@ class Department(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
-    # Relationships
-    hod: Mapped["User"] = relationship("User", foreign_keys=[hod_id], back_populates="departments_as_hod")
-    members: Mapped[list["User"]] = relationship("User", foreign_keys="User.department_id", back_populates="department")
-    bookings: Mapped[list["RoomBooking"]] = relationship("RoomBooking", back_populates="requester_department")
+    hod: Mapped[User | None] = relationship("User", foreign_keys=[hod_id], back_populates="departments_as_hod")
+    members: Mapped[list[User]] = relationship("User", foreign_keys="User.department_id", back_populates="department")
+    bookings: Mapped[list[RoomBooking]] = relationship("RoomBooking", back_populates="requester_department")

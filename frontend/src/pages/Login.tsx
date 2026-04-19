@@ -20,11 +20,15 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  // const { login } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" },
   });
@@ -32,15 +36,17 @@ export default function LoginPage() {
   const onSubmit = async (values: FormValues) => {
     setSubmitting(true);
     try {
-      // const res = await api.post("/auth/login", values);
-      // const token: string | undefined =
-      //   res.data?.access_token || res.data?.token || res.data?.data?.access_token;
-      // if (!token) throw new Error("No token returned from server");
-      // login(token);
-      // const decoded = decodeJwt(token);
-      // toast.success("Welcome back");
+      const res = await api.post("/auth/login", values);
+      const token: string | undefined =
+        res.data?.access_token ||
+        res.data?.token ||
+        res.data?.data?.access_token;
+      if (!token) throw new Error("No token returned from server");
+      login(token);
+      const decoded = decodeJwt(token);
+      toast.success("Welcome back");
       console.log("Hello");
-      navigate(dashboardPathForRole("faculty"), { replace: true });
+      navigate(dashboardPathForRole(decoded?.role), { replace: true });
     } catch (err) {
       toast.error(extractApiError(err, "Login failed"));
     } finally {
@@ -53,8 +59,14 @@ export default function LoginPage() {
       {/* animated background blobs */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 -left-24 h-112 w-md rounded-full bg-accent/30 blur-3xl animate-blob" />
-        <div className="absolute top-1/3 -right-24 h-96 w-[24rem] rounded-full bg-purple/30 blur-3xl animate-blob" style={{ animationDelay: "4s" }} />
-        <div className="absolute -bottom-24 left-1/3 h-88 w-88 rounded-full bg-info/25 blur-3xl animate-blob" style={{ animationDelay: "8s" }} />
+        <div
+          className="absolute top-1/3 -right-24 h-96 w-[24rem] rounded-full bg-purple/30 blur-3xl animate-blob"
+          style={{ animationDelay: "4s" }}
+        />
+        <div
+          className="absolute -bottom-24 left-1/3 h-88 w-88 rounded-full bg-info/25 blur-3xl animate-blob"
+          style={{ animationDelay: "8s" }}
+        />
       </div>
 
       <motion.div
@@ -69,34 +81,70 @@ export default function LoginPage() {
               <Building2 className="h-5 w-5" />
             </div>
             <div>
-              <h1 className="text-xl font-semibold tracking-tight text-foreground">College Room Booking</h1>
-              <p className="text-sm text-muted-foreground">Sign in to manage your bookings</p>
+              <h1 className="text-xl font-semibold tracking-tight text-foreground">
+                College Room Booking
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Sign in to manage your bookings
+              </p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="space-y-4"
+            noValidate
+          >
             <div className="space-y-1.5">
               <Label htmlFor="email">Email</Label>
               <div className="relative">
                 <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="email" type="email" autoComplete="email" placeholder="you@college.edu"
-                  className="pl-9" {...register("email")} />
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@college.edu"
+                  className="pl-9"
+                  {...register("email")}
+                />
               </div>
-              {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-xs text-destructive">
+                  {errors.email.message}
+                </p>
+              )}
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="password">Password</Label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••"
-                  className="pl-9" {...register("password")} />
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  className="pl-9"
+                  {...register("password")}
+                />
               </div>
-              {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-xs text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
-            <Button type="submit" disabled={submitting} className="mt-2 h-11 w-full bg-accent-gradient text-accent-foreground shadow-elegant hover:opacity-95">
-              {submitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <LogIn className="mr-2 h-4 w-4" />}
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="mt-2 h-11 w-full bg-accent-gradient text-accent-foreground shadow-elegant hover:opacity-95"
+            >
+              {submitting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogIn className="mr-2 h-4 w-4" />
+              )}
               {submitting ? "Signing in…" : "Sign In"}
             </Button>
           </form>

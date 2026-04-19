@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 from sqlalchemy import String, Integer, Boolean, Text, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
-from backend.src.app.models.availability_block import RoomAvailabilityBlock
-from backend.src.app.models.booking import RoomBooking
+
+if TYPE_CHECKING:
+    from app.models.booking import RoomBooking
+    from app.models.availability_block import RoomAvailabilityBlock
+
 
 class Room(Base):
     __tablename__ = "rooms"
@@ -19,6 +25,5 @@ class Room(Base):
     created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now())
     updated_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now())
 
-    # Relationships
-    bookings: Mapped[list["RoomBooking"]] = relationship("RoomBooking", back_populates="room")
-    availability_blocks: Mapped[list["RoomAvailabilityBlock"]] = relationship("RoomAvailabilityBlock", back_populates="room")
+    bookings: Mapped[list[RoomBooking]] = relationship("RoomBooking", back_populates="room")
+    availability_blocks: Mapped[list[RoomAvailabilityBlock]] = relationship("RoomAvailabilityBlock", back_populates="room")

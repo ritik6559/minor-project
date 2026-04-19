@@ -1,10 +1,16 @@
+from __future__ import annotations
+
 import uuid
-from sqlalchemy import Index, String, Text, Boolean, DateTime, ForeignKey, Enum as SAEnum, func
+from typing import TYPE_CHECKING
+from sqlalchemy import String, Text, Boolean, DateTime, ForeignKey, Enum as SAEnum, Index, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 from app.models.enums import NotificationType
-from backend.src.app.models.booking import RoomBooking
-from backend.src.app.models.user import User
+
+if TYPE_CHECKING:
+    from app.models.user import User
+    from app.models.booking import RoomBooking
+
 
 class Notification(Base):
     __tablename__ = "notifications"
@@ -18,9 +24,8 @@ class Notification(Base):
     is_read: Mapped[bool] = mapped_column(Boolean, default=False)
     created_at: Mapped[DateTime] = mapped_column(DateTime, server_default=func.now(), index=True)
 
-    # Relationships
-    user: Mapped["User"] = relationship("User", back_populates="notifications")
-    booking: Mapped["RoomBooking | None"] = relationship("RoomBooking", back_populates="notifications")
+    user: Mapped[User] = relationship("User", back_populates="notifications")
+    booking: Mapped[RoomBooking | None] = relationship("RoomBooking", back_populates="notifications")
 
     __table_args__ = (
         Index("ix_notifications_user_read", "user_id", "is_read"),
