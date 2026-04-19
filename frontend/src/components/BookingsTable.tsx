@@ -1,5 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { motion, AnimatePresence } from "framer-motion";
 import { StatusBadge } from "./StatusBadge";
 import { formatDateRange } from "@/lib/booking-utils";
@@ -25,23 +32,70 @@ interface Props {
 }
 
 export function BookingsTable({
-  bookings, isLoading, onRowClick, emptyTitle = "No bookings yet",
+  bookings,
+  isLoading,
+  onRowClick,
+  emptyTitle = "No bookings yet",
   emptyMessage = "When bookings appear, they'll show up here.",
-  extraActions, showRequester,
+  extraActions,
+  showRequester,
 }: Props) {
   const columns: Column[] = [
-    { key: "ref", header: "Reference", render: (b) => <span className="font-mono text-xs">{b.reference}</span> },
-    ...(showRequester ? [{ key: "req", header: "Requester", render: (b: Booking) => b.requester?.name || b.requester_name || "—" }] : []),
-    { key: "room", header: "Room", render: (b) => b.room ? `${b.room.room_number}${b.room.name ? " · " + b.room.name : ""}` : "—" },
-    { key: "purpose", header: "Purpose", className: "max-w-[260px]", render: (b) => <span className="block truncate" title={b.purpose}>{b.purpose}</span> },
-    { key: "when", header: "Date & Time", render: (b) => <span className="whitespace-nowrap text-sm">{formatDateRange(b.date, b.start_time, b.end_time)}</span> },
-    { key: "status", header: "Status", render: (b) => <StatusBadge status={b.status} /> },
+    {
+      key: "ref",
+      header: "Reference",
+      render: (b) => <span className="font-mono text-xs">{b.reference}</span>,
+    },
+    ...(showRequester
+      ? [
+          {
+            key: "req",
+            header: "Requester",
+            render: (b: Booking) =>
+              b.requester?.name || b.requester_name || "—",
+          },
+        ]
+      : []),
+    {
+      key: "room",
+      header: "Room",
+      render: (b) =>
+        b.room
+          ? `${b.room.room_number}${b.room.name ? " · " + b.room.name : ""}`
+          : "—",
+    },
+    {
+      key: "purpose",
+      header: "Purpose",
+      className: "max-w-[260px]",
+      render: (b) => (
+        <span className="block truncate" title={b.purpose}>
+          {b.purpose}
+        </span>
+      ),
+    },
+    {
+      key: "when",
+      header: "Date & Time",
+      render: (b) => (
+        <span className="whitespace-nowrap text-sm">
+          {formatDateRange(b.date, b.start_time, b.end_time)}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
+      render: (b) => <StatusBadge status={b.status} />,
+    },
   ];
 
   if (isLoading) {
     return (
       <div className="space-y-2">
-        {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
+        {Array.from({ length: 5 }).map((_, i) => (
+          <Skeleton key={i} className="h-12 w-full" />
+        ))}
       </div>
     );
   }
@@ -63,8 +117,12 @@ export function BookingsTable({
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/40">
-            {columns.map((c) => <TableHead key={c.key}>{c.header}</TableHead>)}
-            {extraActions && <TableHead className="text-right">Actions</TableHead>}
+            {columns.map((c) => (
+              <TableHead key={c.key}>{c.header}</TableHead>
+            ))}
+            {extraActions && (
+              <TableHead className="text-right">Actions</TableHead>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -81,11 +139,18 @@ export function BookingsTable({
                 className="cursor-pointer border-b transition-colors hover:bg-muted/30 data-[state=selected]:bg-muted"
               >
                 {columns.map((c) => (
-                  <TableCell key={c.key} className={c.className}>{c.render(b)}</TableCell>
+                  <TableCell key={c.key} className={c.className}>
+                    {c.render(b)}
+                  </TableCell>
                 ))}
                 {extraActions && (
-                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex justify-end gap-2">{extraActions(b)}</div>
+                  <TableCell
+                    className="text-right"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="flex justify-end gap-2">
+                      {extraActions(b)}
+                    </div>
                   </TableCell>
                 )}
               </motion.tr>

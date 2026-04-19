@@ -24,6 +24,7 @@ async def create_booking(
 ):
     """Faculty only — submit a new room booking request."""
     require_roles(UserRole.faculty)(current_user)
+    print(data)
     return await BookingService(db).create(data, current_user.id)
 
 

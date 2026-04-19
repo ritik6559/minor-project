@@ -5,7 +5,11 @@ import { Loader2 } from "lucide-react";
 import { BookingsTable } from "@/components/BookingsTable";
 import { BookingDrawer } from "@/components/BookingDrawer";
 import { ApprovalDialog } from "@/components/ApprovalDialog";
-import { useApproveBooking, useBookings, useRejectBooking } from "@/hooks/useBookings";
+import {
+  useApproveBooking,
+  useBookings,
+  useRejectBooking,
+} from "@/hooks/useBookings";
 import type { Booking, BookingStatus } from "@/types/booking";
 
 interface Props {
@@ -15,11 +19,23 @@ interface Props {
   historyTitle?: string;
 }
 
-export function ApprovalDashboard({ pendingStatus, pendingTitle, historyTitle = "History" }: Props) {
-  const { data: pending, isLoading: loadingPending } = useBookings({ status: pendingStatus, scope: "pending" });
-  const { data: history, isLoading: loadingHistory } = useBookings({ scope: "history" });
+export function ApprovalDashboard({
+  pendingStatus,
+  pendingTitle,
+  historyTitle = "History",
+}: Props) {
+  const { data: pending, isLoading: loadingPending } = useBookings({
+    status: pendingStatus,
+    scope: "pending",
+  });
+  const { data: history, isLoading: loadingHistory } = useBookings({
+    scope: "history",
+  });
   const [selected, setSelected] = useState<Booking | null>(null);
-  const [actioning, setActioning] = useState<{ booking: Booking; type: "approve" | "reject" } | null>(null);
+  const [actioning, setActioning] = useState<{
+    booking: Booking;
+    type: "approve" | "reject";
+  } | null>(null);
 
   const approveMut = useApproveBooking();
   const rejectMut = useRejectBooking();
@@ -27,7 +43,8 @@ export function ApprovalDashboard({ pendingStatus, pendingTitle, historyTitle = 
   const onConfirm = async (comments: string) => {
     if (!actioning) return;
     const id = actioning.booking.id;
-    if (actioning.type === "approve") await approveMut.mutateAsync({ id, comments });
+    if (actioning.type === "approve")
+      await approveMut.mutateAsync({ id, comments });
     else await rejectMut.mutateAsync({ id, comments });
     setActioning(null);
   };
@@ -50,14 +67,28 @@ export function ApprovalDashboard({ pendingStatus, pendingTitle, historyTitle = 
             emptyMessage="Nothing waiting for your review right now."
             extraActions={(b) => (
               <>
-                <Button size="sm" className="bg-success text-success-foreground hover:bg-success/90"
+                <Button
+                  size="sm"
+                  className="bg-success text-success-foreground hover:bg-success/90"
                   onClick={() => setActioning({ booking: b, type: "approve" })}
-                  disabled={approveMut.isPending && approveMut.variables?.id === b.id}>
-                  {approveMut.isPending && approveMut.variables?.id === b.id ? <Loader2 className="h-3 w-3 animate-spin" /> : "Approve"}
+                  disabled={
+                    approveMut.isPending && approveMut.variables?.id === b.id
+                  }
+                >
+                  {approveMut.isPending && approveMut.variables?.id === b.id ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    "Approve"
+                  )}
                 </Button>
-                <Button size="sm" variant="destructive"
+                <Button
+                  size="sm"
+                  variant="destructive"
                   onClick={() => setActioning({ booking: b, type: "reject" })}
-                  disabled={rejectMut.isPending && rejectMut.variables?.id === b.id}>
+                  disabled={
+                    rejectMut.isPending && rejectMut.variables?.id === b.id
+                  }
+                >
                   Reject
                 </Button>
               </>
@@ -77,7 +108,12 @@ export function ApprovalDashboard({ pendingStatus, pendingTitle, historyTitle = 
         </TabsContent>
       </Tabs>
 
-      <BookingDrawer booking={selected} open={!!selected} onOpenChange={(v) => !v && setSelected(null)} />
+      <BookingDrawer
+        booking={selected}
+        open={!!selected}
+        onOpenChange={(v) => !v && setSelected(null)}
+      />
+      
       <ApprovalDialog
         open={!!actioning}
         onOpenChange={(v) => !v && setActioning(null)}

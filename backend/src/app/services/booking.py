@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import BadRequestException, ConflictException, ForbiddenException, NotFoundException
 from app.models.availability_block import RoomAvailabilityBlock
 from app.models.booking import RoomBooking
-from app.models.enums import AuditAction, BookingStatus, UserRole
+from app.models.enums import AuditAction, BookingStatus
 from app.repositories.booking import BookingRepository
 from app.repositories.room import RoomRepository
 from app.repositories.user import UserRepository
@@ -20,6 +20,12 @@ def _make_reference() -> str:
     suffix = "".join(random.choices(string.ascii_uppercase + string.digits, k=8))
     return f"BK{suffix}"
 
+def _to_utc_naive(dt: datetime) -> datetime:
+    """Convert to UTC then strip tzinfo — matches TIMESTAMP WITHOUT TIME ZONE columns."""
+    if dt.tzinfo is None:
+        return dt
+    return dt.astimezone(timezone.utc).replace(tzinfo=None)
+
 
 class BookingService:
     def __init__(self, db: AsyncSession) -> None:
@@ -31,48 +37,56 @@ class BookingService:
         self.notifications = NotificationService(db)
 
     async def create(self, data: BookingCreate, requester_id: str) -> RoomBooking:
-        # 1. Room must exist and be active
+        start = _to_utc_naive(data.start_datetime)
+        end   = _to_utc_naive(data.end_datetime)
+        now   = datetime.utcnow()  # also naive UTC to match
+
         room = await self.room_repo.get_by_id(data.room_id)
         if not room or not room.is_active:
             raise NotFoundException("Room not found or inactive")
 
-        # 2. Validate start/end sanity
-        if data.start_datetime <= datetime.now(timezone.utc):
+        if start <= now:
             raise BadRequestException("Booking must be scheduled in the future")
 
-        # 3. Conflict check
-        if await self.repo.check_conflict(data.room_id, data.start_datetime, data.end_datetime):
+        if end <= start:
+            raise BadRequestException("End time must be after start time")
+
+        if await self.repo.check_conflict(data.room_id, start, end):
             raise ConflictException("Room is already booked for the selected time slot")
 
-        # 4. Validate personnel exist
         for field, uid in [
-            ("faculty_incharge_id", data.faculty_incharge_id),
+            ("faculty_incharge_id",    data.faculty_incharge_id),
             ("student_coordinator_id", data.student_coordinator_id),
-            ("faculty_supervisor_id", data.faculty_supervisor_id),
+            ("faculty_supervisor_id",  data.faculty_supervisor_id),
         ]:
             if not await self.user_repo.get_by_id(uid):
                 raise NotFoundException(f"User for {field} not found: {uid}")
 
-        # 5. Create booking
         booking = RoomBooking(
             booking_reference=_make_reference(),
             requester_id=requester_id,
             status=BookingStatus.pending_hod,
-            **data.model_dump(),
+            room_id=data.room_id,
+            requester_department_id=data.requester_department_id,
+            purpose=data.purpose,
+            start_datetime=start,   # ← naive UTC
+            end_datetime=end,       # ← naive UTC
+            expected_attendees=data.expected_attendees,
+            faculty_incharge_id=data.faculty_incharge_id,
+            student_coordinator_id=data.student_coordinator_id,
+            faculty_supervisor_id=data.faculty_supervisor_id,
         )
         booking = await self.repo.create(booking)
 
-        # 6. Block the slot
         self.db.add(
             RoomAvailabilityBlock(
                 room_id=booking.room_id,
                 booking_id=booking.id,
-                start_datetime=booking.start_datetime,
-                end_datetime=booking.end_datetime,
+                start_datetime=start,
+                end_datetime=end,
             )
         )
 
-        # 7. Audit + notify
         await self.audit.log(
             "room_bookings", booking.id, AuditAction.create,
             user_id=requester_id,
@@ -81,7 +95,7 @@ class BookingService:
         await self.notifications.on_booking_submitted(booking)
 
         return booking
-
+    
     async def cancel(self, booking_id: str, requester_id: str) -> RoomBooking:
         booking = await self.repo.get_by_id(booking_id)
         if not booking:

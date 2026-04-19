@@ -8,7 +8,7 @@ from app.core.config import settings
 from app.core.exceptions import UnauthorizedException
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+print(pwd_context.hash("password123"))
 
 def hash_password(plain: str) -> str:
     return pwd_context.hash(plain)

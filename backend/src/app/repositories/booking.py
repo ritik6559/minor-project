@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,12 +36,18 @@ class BookingRepository(BaseRepository[RoomBooking]):
         return result.scalar_one_or_none()
 
     async def check_conflict(
-        self,
-        room_id: str,
-        start: datetime,
-        end: datetime,
-        exclude_id: str | None = None,
+    self,
+    room_id: str,
+    start: datetime,
+    end: datetime,
+    exclude_id: str | None = None,
     ) -> bool:
+        # Strip tzinfo — column is TIMESTAMP WITHOUT TIME ZONE
+        if start.tzinfo is not None:
+            start = start.astimezone(timezone.utc).replace(tzinfo=None)
+        if end.tzinfo is not None:
+            end = end.astimezone(timezone.utc).replace(tzinfo=None)
+
         query = select(RoomBooking).where(
             and_(
                 RoomBooking.room_id == room_id,

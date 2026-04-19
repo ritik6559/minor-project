@@ -3,7 +3,13 @@ import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { CalendarCheck, CheckCircle2, Clock, PlusCircle, XCircle } from "lucide-react";
+import {
+  CalendarCheck,
+  CheckCircle2,
+  Clock,
+  PlusCircle,
+  XCircle,
+} from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { BookingsTable } from "@/components/BookingsTable";
 import { BookingDrawer } from "@/components/BookingDrawer";
@@ -20,9 +26,9 @@ export default function FacultyDashboard() {
     const list = bookings ?? [];
     return {
       total: list.length,
-      pending: list.filter(b => b.status.startsWith("PENDING_")).length,
-      approved: list.filter(b => b.status === "DEAN_APPROVED").length,
-      rejected: list.filter(b => b.status.endsWith("REJECTED")).length,
+      pending: list.filter((b) => b.status.startsWith("PENDING_")).length,
+      approved: list.filter((b) => b.status === "DEAN_APPROVED").length,
+      rejected: list.filter((b) => b.status.endsWith("REJECTED")).length,
     };
   }, [bookings]);
 
@@ -40,11 +46,17 @@ export default function FacultyDashboard() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <TabsList>
             <TabsTrigger value="mine">My Bookings</TabsTrigger>
-            <TabsTrigger value="new" onClick={() => navigate("/dashboard/faculty/new")}>
+            <TabsTrigger
+              value="new"
+              onClick={() => navigate("/dashboard/faculty/new")}
+            >
               New Booking
             </TabsTrigger>
           </TabsList>
-          <Button onClick={() => navigate("/dashboard/faculty/new")} className="bg-accent-gradient text-accent-foreground hover:opacity-95">
+          <Button
+            onClick={() => navigate("/dashboard/faculty/new")}
+            className="bg-accent-gradient text-accent-foreground hover:opacity-95"
+          >
             <PlusCircle className="mr-2 h-4 w-4" /> New booking
           </Button>
         </div>
@@ -52,9 +64,24 @@ export default function FacultyDashboard() {
         <TabsContent value="mine" className="space-y-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <StatCard label="Total" value={stats.total} icon={CalendarCheck} />
-            <StatCard label="Pending" value={stats.pending} icon={Clock} tone="warning" />
-            <StatCard label="Approved" value={stats.approved} icon={CheckCircle2} tone="success" />
-            <StatCard label="Rejected" value={stats.rejected} icon={XCircle} tone="destructive" />
+            <StatCard
+              label="Pending"
+              value={stats.pending}
+              icon={Clock}
+              tone="warning"
+            />
+            <StatCard
+              label="Approved"
+              value={stats.approved}
+              icon={CheckCircle2}
+              tone="success"
+            />
+            <StatCard
+              label="Rejected"
+              value={stats.rejected}
+              icon={XCircle}
+              tone="destructive"
+            />
           </div>
 
           <BookingsTable
@@ -70,7 +97,13 @@ export default function FacultyDashboard() {
       <BookingDrawer
         booking={selected}
         open={!!selected}
-        onOpenChange={(v) => { if (!v) { setSelected(null); params.delete("booking"); setParams(params, { replace: true }); } }}
+        onOpenChange={(v) => {
+          if (!v) {
+            setSelected(null);
+            params.delete("booking");
+            setParams(params, { replace: true });
+          }
+        }}
       />
     </div>
   );

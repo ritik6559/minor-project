@@ -35,6 +35,7 @@ export function useUsersByRole(role: string) {
   return useQuery<UserLite[]>({
     queryKey: ["users-by-role", role],
     queryFn: async () => {
+      console.log("Fetching users with role", role);
       const res = await api.get(`/users/by-role/${role}`);
       const data = res.data?.data ?? res.data ?? [];
       return Array.isArray(data) ? data : [];
@@ -44,12 +45,16 @@ export function useUsersByRole(role: string) {
 
 export interface NewBookingPayload {
   room_id: string | number;
-  date: string;
-  start_time: string;
-  end_time: string;
+
+  requester_department_id: string;
+
   purpose: string;
-  expected_attendees: number;
-  phone_number: string;
+
+  start_datetime: string;
+  end_datetime: string;
+
+  expected_attendees?: number;
+
   faculty_incharge_id: string | number;
   student_coordinator_id: string | number;
   faculty_supervisor_id: string | number;
@@ -59,7 +64,7 @@ export function useCreateBooking() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (payload: NewBookingPayload) => {
-      const res = await api.post("/bookings", payload);
+      const res = await api.post("/bookings/", payload);
       return res.data;
     },
     onSuccess: () => {
@@ -73,7 +78,7 @@ export function useApproveBooking() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, comments }: { id: string | number; comments?: string }) => {
-      const res = await api.post(`/bookings/${id}/approve`, { comments });
+      const res = await api.post(`/approvals/${id}/`, { comments, action: "approved" });
       return res.data;
     },
     onSuccess: () => {
@@ -89,7 +94,7 @@ export function useRejectBooking() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, comments }: { id: string | number; comments?: string }) => {
-      const res = await api.post(`/bookings/${id}/reject`, { comments });
+      const res = await api.post(`/bookings/${id}/reject`, { comments, action: "rejected" });
       return res.data;
     },
     onSuccess: () => {

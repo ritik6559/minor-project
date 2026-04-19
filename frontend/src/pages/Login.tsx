@@ -45,7 +45,6 @@ export default function LoginPage() {
       login(token);
       const decoded = decodeJwt(token);
       toast.success("Welcome back");
-      console.log("Hello");
       navigate(dashboardPathForRole(decoded?.role), { replace: true });
     } catch (err) {
       toast.error(extractApiError(err, "Login failed"));

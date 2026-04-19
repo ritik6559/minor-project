@@ -12,10 +12,17 @@ export function ProtectedRoute({ children, allowedRoles }: Props) {
   const { isAuthenticated, role, loading } = useAuth();
   const location = useLocation();
 
-  if (loading) return null;
-  if (!isAuthenticated) return <Navigate to="/login" replace state={{ from: location }} />;
+  if (loading) {
+    return null;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location }} />;
+  }
+
   if (allowedRoles && role && !allowedRoles.includes(role)) {
     return <Navigate to={dashboardPathForRole(role)} replace />;
   }
+  
   return <>{children}</>;
 }
