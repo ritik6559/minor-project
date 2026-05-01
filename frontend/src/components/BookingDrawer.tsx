@@ -68,7 +68,6 @@ export function BookingDrawer({ booking, open, onOpenChange }: Props) {
                   icon={Calendar}
                   label="When"
                   value={formatDateRange(
-                    booking.created_at!,
                     booking.start_datetime,
                     booking.end_datetime,
                   )}

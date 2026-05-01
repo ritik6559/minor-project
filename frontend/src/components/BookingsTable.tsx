@@ -81,7 +81,7 @@ export function BookingsTable({
       header: "Date & Time",
       render: (b) => (
         <span className="whitespace-nowrap text-sm">
-          {formatDateRange(b.created_at!, b.start_datetime, b.end_datetime)}
+          {formatDateRange(b.start_datetime, b.end_datetime)}
         </span>
       ),
     },
