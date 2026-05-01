@@ -40,7 +40,7 @@ export default function FacultyDashboard() {
     if (found) setSelected(found);
   }, [params, bookings]);
 
-  console.log(bookings)
+  console.log(bookings);
 
   return (
     <div className="space-y-6">
