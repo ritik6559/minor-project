@@ -113,7 +113,7 @@ export function ApprovalDashboard({
         open={!!selected}
         onOpenChange={(v) => !v && setSelected(null)}
       />
-      
+
       <ApprovalDialog
         open={!!actioning}
         onOpenChange={(v) => !v && setActioning(null)}

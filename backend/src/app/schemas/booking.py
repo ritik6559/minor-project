@@ -31,16 +31,26 @@ class BookingResponse(BaseModel):
 
     id: str
     booking_reference: str
+
     room_id: str
     requester_id: str
     requester_department_id: str
+
     purpose: str
     start_datetime: datetime
     end_datetime: datetime
     expected_attendees: int | None
+
+    room: RoomResponse
+
     faculty_incharge_id: str
     student_coordinator_id: str
     faculty_supervisor_id: str
+
+    faculty_incharge: UserResponse
+    student_coordinator: UserResponse
+    faculty_supervisor: UserResponse
+
     status: BookingStatus
     submitted_at: datetime
     completed_at: datetime | None

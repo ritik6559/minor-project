@@ -19,16 +19,36 @@ const toneStyles: Record<NonNullable<Props["tone"]>, string> = {
   purple: "bg-purple/15 text-purple",
 };
 
-export function StatCard({ label, value, icon: Icon, tone = "default", className }: Props) {
+export function StatCard({
+  label,
+  value,
+  icon: Icon,
+  tone = "default",
+  className,
+}: Props) {
   return (
-    <Card className={cn("glass border-border/60 transition-transform hover:-translate-y-0.5 hover:shadow-elegant", className)}>
+    <Card
+      className={cn(
+        "glass border-border/60 transition-transform hover:-translate-y-0.5 hover:shadow-elegant",
+        className,
+      )}
+    >
       <CardContent className="flex items-center gap-4 p-5">
-        <div className={cn("flex h-11 w-11 items-center justify-center rounded-xl", toneStyles[tone])}>
+        <div
+          className={cn(
+            "flex h-11 w-11 items-center justify-center rounded-xl",
+            toneStyles[tone],
+          )}
+        >
           <Icon className="h-5 w-5" />
         </div>
         <div className="min-w-0">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">{label}</p>
-          <p className="mt-0.5 text-2xl font-semibold tracking-tight">{value}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+            {label}
+          </p>
+          <p className="mt-0.5 text-2xl font-semibold tracking-tight">
+            {value}
+          </p>
         </div>
       </CardContent>
     </Card>

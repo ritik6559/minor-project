@@ -1,15 +1,23 @@
 export type BookingStatus =
-  | "PENDING_HOD"
-  | "PENDING_ADMIN"
-  | "PENDING_DEAN"
-  | "DEAN_APPROVED"
-  | "HOD_REJECTED"
-  | "ADMIN_REJECTED"
-  | "DEAN_REJECTED"
-  | "CANCELLED";
+  | "pending_hod"
+  | "pending_admin"
+  | "pending_dean"
+  | "dean_approved"
+  | "hod_rejected"
+  | "admin_rejected"
+  | "dean_rejected"
+  | "cancelled";
+
+export interface UserLite {
+  id: string;
+  name: string;
+  email?: string;
+  role?: string;
+  phone?: string;
+}
 
 export interface Room {
-  id: string | number;
+  id: string;
   room_number: string;
   name?: string;
   building?: string;
@@ -19,15 +27,8 @@ export interface Room {
   is_active?: boolean;
 }
 
-export interface UserLite {
-  id: string | number;
-  name: string;
-  email?: string;
-  role?: string;
-}
-
 export interface ApprovalEntry {
-  id?: string | number;
+  id: string;
   actor_name?: string;
   actor_role?: string;
   action: "APPROVED" | "REJECTED" | "SUBMITTED" | "CANCELLED";
@@ -36,32 +37,67 @@ export interface ApprovalEntry {
 }
 
 export interface Booking {
-  id: string | number;
-  reference: string;
+  id: string;
+  booking_reference: string;
+
+  // ✅ Relations
   room?: Room;
-  room_id?: string | number;
-  requester_name?: string;
   requester?: UserLite;
-  purpose: string;
-  expected_attendees?: number;
-  phone_number?: string;
-  date: string; // YYYY-MM-DD
-  start_time: string;
-  end_time: string;
-  status: BookingStatus;
+
   faculty_incharge?: UserLite;
   student_coordinator?: UserLite;
   faculty_supervisor?: UserLite;
+
+  // Optional IDs
+  room_id?: string;
+
+  purpose: string;
+  expected_attendees?: number;
+
+  start_datetime: string;
+  end_datetime: string;
+
+  status: BookingStatus;
+
   approvals?: ApprovalEntry[];
   created_at?: string;
 }
 
+
 export interface NotificationItem {
-  id: string | number;
+  id: string;
   title: string;
   message: string;
   type?: "info" | "success" | "warning" | "error" | string;
   is_read: boolean;
-  booking_id?: string | number;
+  booking_id?: string;
   created_at: string;
 }
+
+
+export interface BookingUI extends Booking {
+  date: string;        
+  time_range: string;  
+}
+
+
+export const mapBookingToUI = (booking: Booking): BookingUI => {
+  const start = new Date(booking.start_datetime);
+  const end = new Date(booking.end_datetime);
+
+  const date = start.toISOString().split("T")[0];
+
+  const time_range = `${start.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })} - ${end.toLocaleTimeString([], {
+    hour: "2-digit",
+    minute: "2-digit",
+  })}`;
+
+  return {
+    ...booking,
+    date,
+    time_range,
+  };
+};

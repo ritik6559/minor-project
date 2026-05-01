@@ -44,7 +44,9 @@ export function BookingsTable({
     {
       key: "ref",
       header: "Reference",
-      render: (b) => <span className="font-mono text-xs">{b.reference}</span>,
+      render: (b) => (
+        <span className="font-mono text-xs">{b.booking_reference}</span>
+      ),
     },
     ...(showRequester
       ? [
@@ -52,7 +54,7 @@ export function BookingsTable({
             key: "req",
             header: "Requester",
             render: (b: Booking) =>
-              b.requester?.name || b.requester_name || "—",
+              b.requester?.name || b.faculty_incharge?.name || "—",
           },
         ]
       : []),
@@ -79,7 +81,7 @@ export function BookingsTable({
       header: "Date & Time",
       render: (b) => (
         <span className="whitespace-nowrap text-sm">
-          {formatDateRange(b.date, b.start_time, b.end_time)}
+          {formatDateRange(b.created_at!, b.start_datetime, b.end_datetime)}
         </span>
       ),
     },

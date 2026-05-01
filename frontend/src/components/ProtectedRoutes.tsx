@@ -23,6 +23,6 @@ export function ProtectedRoute({ children, allowedRoles }: Props) {
   if (allowedRoles && role && !allowedRoles.includes(role)) {
     return <Navigate to={dashboardPathForRole(role)} replace />;
   }
-  
+
   return <>{children}</>;
 }

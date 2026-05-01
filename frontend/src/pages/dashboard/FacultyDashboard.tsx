@@ -26,9 +26,9 @@ export default function FacultyDashboard() {
     const list = bookings ?? [];
     return {
       total: list.length,
-      pending: list.filter((b) => b.status.startsWith("PENDING_")).length,
-      approved: list.filter((b) => b.status === "DEAN_APPROVED").length,
-      rejected: list.filter((b) => b.status.endsWith("REJECTED")).length,
+      pending: list.filter((b) => b.status.startsWith("pending_")).length,
+      approved: list.filter((b) => b.status === "dean_approved").length,
+      rejected: list.filter((b) => b.status.endsWith("rejected")).length,
     };
   }, [bookings]);
 
@@ -39,6 +39,8 @@ export default function FacultyDashboard() {
     const found = bookings.find((b) => String(b.id) === id);
     if (found) setSelected(found);
   }, [params, bookings]);
+
+  console.log(bookings)
 
   return (
     <div className="space-y-6">

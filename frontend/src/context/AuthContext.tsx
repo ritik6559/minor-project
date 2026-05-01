@@ -1,6 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/set-state-in-effect */
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import { TOKEN_KEY } from "@/lib/api";
 import { decodeJwt, type JwtPayload, type Role } from "@/lib/jwt";
 
@@ -17,10 +25,14 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem(TOKEN_KEY));
+  const [token, setToken] = useState<string | null>(() =>
+    localStorage.getItem(TOKEN_KEY),
+  );
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { setLoading(false); }, []);
+  useEffect(() => {
+    setLoading(false);
+  }, []);
 
   const user = useMemo(() => (token ? decodeJwt(token) : null), [token]);
   const role = (user?.role as Role | undefined) ?? null;
@@ -29,8 +41,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user?.exp) return;
     const ms = user.exp * 1000 - Date.now();
-    if (ms <= 0) { setToken(null); localStorage.removeItem(TOKEN_KEY); return; }
-    const t = setTimeout(() => { setToken(null); localStorage.removeItem(TOKEN_KEY); }, ms);
+    if (ms <= 0) {
+      setToken(null);
+      localStorage.removeItem(TOKEN_KEY);
+      return;
+    }
+    const t = setTimeout(() => {
+      setToken(null);
+      localStorage.removeItem(TOKEN_KEY);
+    }, ms);
     return () => clearTimeout(t);
   }, [user?.exp]);
 
