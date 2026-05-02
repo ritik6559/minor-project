@@ -15,21 +15,15 @@ from app.schemas.approval import ApprovalRequest
 from app.services.audit import AuditService
 from app.services.notification import NotificationService
 
-# ── Approval state machine ────────────────────────────────────────────────────
-# (current_status, approver_role, action) → next_status
 TRANSITIONS: dict[tuple[BookingStatus, ApproverRole, ApprovalAction], BookingStatus] = {
-    # HOD
     (BookingStatus.pending_hod,   ApproverRole.hod,             ApprovalAction.approved): BookingStatus.pending_admin,
     (BookingStatus.pending_hod,   ApproverRole.hod,             ApprovalAction.rejected): BookingStatus.hod_rejected,
-    # Admin assistant
     (BookingStatus.pending_admin, ApproverRole.admin_assistant, ApprovalAction.approved): BookingStatus.pending_dean,
     (BookingStatus.pending_admin, ApproverRole.admin_assistant, ApprovalAction.rejected): BookingStatus.admin_rejected,
-    # Dean / Registrar
     (BookingStatus.pending_dean,  ApproverRole.dean,            ApprovalAction.approved): BookingStatus.dean_approved,
     (BookingStatus.pending_dean,  ApproverRole.dean,            ApprovalAction.rejected): BookingStatus.dean_rejected,
 }
 
-# Maps UserRole → ApproverRole
 USER_TO_APPROVER: dict[UserRole, ApproverRole] = {
     UserRole.hod:             ApproverRole.hod,
     UserRole.admin_assistant: ApproverRole.admin_assistant,
@@ -90,4 +84,4 @@ class ApprovalService:
             old_values={"status": old_status.value},
             new_values={"status": next_status.value},
         )
-        await self.notifications.on_approval_action(booking, data.action, approver.name)
+        await self.notifications.on_approval_action(booking, data.action, approver)
