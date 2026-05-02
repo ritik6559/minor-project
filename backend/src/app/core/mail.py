@@ -27,7 +27,7 @@ async def send_email(to: list[str], subject: str, body: str) -> None:
             body=body,
             subtype=MessageType.html,
         )
+
         await _mailer.send_message(message)
     except Exception as e:
-        # Never let a mail failure crash the booking flow
         print(f"[MAIL ERROR] Failed to send to {to}: {e}")
